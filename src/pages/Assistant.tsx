@@ -99,7 +99,9 @@ export function Assistant() {
         PROVIDER = null;
         setProvider(null);
       }
-      update({ content: code === 'refused' ? '' : err?.text ?? '', pending: false, error: errorCopy(code), used: [...used] });
+      // For unexpected failures, show the service's own reason so problems can be diagnosed.
+      const detail = !['cancelled', 'refused', 'not_granted', 'rate_limited'].includes(code) && err?.message ? ` (${String(err.message).slice(0, 160)})` : '';
+      update({ content: code === 'refused' ? '' : err?.text ?? '', pending: false, error: errorCopy(code) + detail, used: [...used] });
     } finally {
       setBusy(null);
       ctl.current = null;
